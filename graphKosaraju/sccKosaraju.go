@@ -1,13 +1,14 @@
 package graphKosaraju
 
 import (
+	"SCC_analysis/graph"
 	"fmt"
 	"github.com/abaron10/Gothon/gothonSlice"
 )
 
-type GraphK struct {
-	visitedNodes  []int
-	reversedGraph *GraphK
+type graphK struct {
+	addedNodes    []int
+	reversedGraph *graphK
 	graphNodes    map[int][]*edge
 }
 
@@ -16,39 +17,39 @@ type edge struct {
 	to   int
 }
 
-func NewEdge(from int, to int) *edge {
+func newEdge(from int, to int) *edge {
 	return &edge{from: from, to: to}
 }
 
-func NewGraphK() *GraphK {
-	reversedGraph := &GraphK{visitedNodes: []int{}, graphNodes: map[int][]*edge{}}
-	return &GraphK{visitedNodes: []int{}, graphNodes: map[int][]*edge{}, reversedGraph: reversedGraph}
+func NewGraphK() graph.Graph {
+	reversedGraph := &graphK{addedNodes: []int{}, graphNodes: map[int][]*edge{}}
+	return &graphK{addedNodes: []int{}, graphNodes: map[int][]*edge{}, reversedGraph: reversedGraph}
 }
 
-func (g *GraphK) AddEdge(from int, to int) {
-	if g == nil {
-		return
-	}
+func (g *graphK) AddEdge(from int, to int) {
 	edges, _ := g.graphNodes[from]
-	edges = append(edges, NewEdge(from, to))
+	edges = append(edges, newEdge(from, to))
 
 	g.graphNodes[from] = edges
-	g.visitedNodes = append(g.visitedNodes, from)
+	g.addedNodes = append(g.addedNodes, from)
+
 	//Computing transposed graph at the same time user adds an Edge.
-	g.reversedGraph.AddEdge(to, from)
+	if g.reversedGraph != nil {
+		g.reversedGraph.AddEdge(to, from)
+	}
 }
 
-func (g *GraphK) EvaluateKosaraju() {
+func (g *graphK) EvaluateSCC() {
 	baseOrder := g.calculateStackBaseOrder()
 	g.findSCCComponents(baseOrder)
-	//g.computeAnswer(r)
+	//g.computeAnswer(sccResult)
 }
 
-func (g *GraphK) calculateStackBaseOrder() []int {
+func (g *graphK) calculateStackBaseOrder() []int {
 	visited := map[int]struct{}{}
 	stack := []int{}
 
-	for _, node := range g.visitedNodes {
+	for _, node := range g.addedNodes {
 		if _, alreadyVisitedNode := visited[node]; !alreadyVisitedNode {
 			g.dfsImplementation(node, visited, &stack)
 		}
@@ -57,7 +58,7 @@ func (g *GraphK) calculateStackBaseOrder() []int {
 	return stack
 }
 
-func (g *GraphK) findSCCComponents(orderNodes []int) map[int]int {
+func (g *graphK) findSCCComponents(orderNodes []int) map[int]int {
 	visited := map[int]struct{}{}
 	SCC := map[int]int{}
 	counter := 0
@@ -79,7 +80,7 @@ func (g *GraphK) findSCCComponents(orderNodes []int) map[int]int {
 --------------------------------DFS IMPLEMENTATIONS (BASE AND TRANSPOSED GRAPH-----------------------------
 -----------------------------------------------------------------------------------------------------------
 */
-func (g *GraphK) dfsImplementation(from int, visited map[int]struct{}, stack *[]int) {
+func (g *graphK) dfsImplementation(from int, visited map[int]struct{}, stack *[]int) {
 	visited[from] = struct{}{}
 	edges, ok := g.graphNodes[from]
 	if ok {
@@ -92,7 +93,7 @@ func (g *GraphK) dfsImplementation(from int, visited map[int]struct{}, stack *[]
 	*stack = append(*stack, from)
 }
 
-func (g *GraphK) dfsImplementationReversed(from int, visited map[int]struct{}, SCC map[int]int, counter int) {
+func (g *graphK) dfsImplementationReversed(from int, visited map[int]struct{}, SCC map[int]int, counter int) {
 	visited[from] = struct{}{}
 	SCC[from] = counter
 	edges, ok := g.reversedGraph.graphNodes[from]
@@ -111,7 +112,7 @@ func (g *GraphK) dfsImplementationReversed(from int, visited map[int]struct{}, S
 -----------------------------------------------------------------------------------------------------------
 */
 
-func (g *GraphK) computeAnswer(sccKeys map[int]int) {
+func (g *graphK) computeAnswer(sccKeys map[int]int) {
 	response := map[int][]int{}
 	for node, sscComponent := range sccKeys {
 		response[sscComponent] = append(response[sscComponent], node)
