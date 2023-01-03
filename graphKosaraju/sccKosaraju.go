@@ -50,7 +50,7 @@ func (g *graph) calculateStackBaseOrder() []int {
 	stack := []int{}
 
 	for _, node := range g.nodes {
-		if _, alreadyVisitedNode := visited[node]; !alreadyVisitedNode {
+		if _, ok := visited[node]; !ok {
 			g.dfs(node, visited, &stack)
 		}
 	}
@@ -66,7 +66,7 @@ func (g *graph) findSCCComponents(orderNodes []int) map[int]int {
 	for len(orderNodes) > 0 {
 		//using https://github.com/abaron10/Gothon library to emulate stack popping as Python do
 		node := gothonSlice.Pop(&orderNodes, -1)
-		if _, alreadyVisitedNode := visited[node]; !alreadyVisitedNode {
+		if _, ok := visited[node]; !ok {
 			g.dfsReversed(node, visited, scc, counter)
 			counter++
 		}
@@ -85,7 +85,7 @@ func (g *graph) dfs(from int, visited map[int]struct{}, stack *[]int) {
 	edges, ok := g.edges[from]
 	if ok {
 		for _, edge := range edges {
-			if _, visitedNode := visited[edge.to]; !visitedNode {
+			if _, ok = visited[edge.to]; !ok {
 				g.dfs(edge.to, visited, stack)
 			}
 		}
@@ -99,7 +99,7 @@ func (g *graph) dfsReversed(from int, visited map[int]struct{}, scc map[int]int,
 	edges, ok := g.reversed.edges[from]
 	if ok {
 		for _, edge := range edges {
-			if _, visitedNode := visited[edge.to]; !visitedNode {
+			if _, ok = visited[edge.to]; !ok {
 				g.dfsReversed(edge.to, visited, scc, counter)
 			}
 		}

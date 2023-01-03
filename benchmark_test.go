@@ -15,20 +15,20 @@ func BenchmarkSCCs(b *testing.B) {
 		12: {9}}
 
 	b.Run("SCC with Tarjan's Algorithm", func(b *testing.B) {
-		graphWithTarjan := graphTarjan.NewGraph()
-		graph.PopulateGraph(graphWithTarjan, edges)
+		tarjanImplementation := graphTarjan.NewGraph()
+		graph.PopulateGraph(tarjanImplementation, edges)
 
 		for i := 0; i < b.N; i++ {
-			graphWithTarjan.EvaluateSCC()
+			tarjanImplementation.EvaluateSCC()
 
 		}
 	})
 	b.Run("SCC with Kosaraju's Algorithm", func(b *testing.B) {
-		graphWithKosaraju := graphKosaraju.NewGraph()
-		graph.PopulateGraph(graphWithKosaraju, edges)
+		kosarajuImplementation := graphKosaraju.NewGraph()
+		graph.PopulateGraph(kosarajuImplementation, edges)
 
 		for i := 0; i < b.N; i++ {
-			graphWithKosaraju.EvaluateSCC()
+			kosarajuImplementation.EvaluateSCC()
 		}
 	})
 }

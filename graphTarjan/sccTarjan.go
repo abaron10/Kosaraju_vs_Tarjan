@@ -41,7 +41,7 @@ func (g *graph) EvaluateSCC() {
 	visited := map[int]struct{}{}
 
 	for _, node := range g.nodes {
-		if _, alreadyVisitedNode := visited[node]; !alreadyVisitedNode {
+		if _, ok := visited[node]; !ok {
 			g.dfs(node, g.edges, visited)
 		}
 	}
@@ -72,11 +72,11 @@ func (g *graph) dfs(from int, graph map[int][]*edge, visited map[int]struct{}) {
 	edges, ok := graph[from]
 	if ok {
 		for _, edge := range edges {
-			if _, visitedNode := visited[edge.to]; !visitedNode {
+			if _, ok = visited[edge.to]; !ok {
 				g.dfs(edge.to, graph, visited)
 			}
 
-			if _, isOnStack := g.onStack[edge.to]; isOnStack {
+			if _, ok = g.onStack[edge.to]; ok {
 				g.lowLink[from] = Min(g.lowLink[from], g.lowLink[edge.to])
 			}
 		}
