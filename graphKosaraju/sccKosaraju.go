@@ -77,7 +77,7 @@ func (g *graph) findSCCComponents(orderNodes []int) map[int]int {
 
 /*
 ---------------------------------------------------------------------------------------------------------
---------------------------------DFS IMPLEMENTATIONS (BASE AND TRANSPOSED GRAPH-----------------------------
+--------------------------------DFS IMPLEMENTATIONS (BASE AND TRANSPOSED GRAPH)---------------------------
 -----------------------------------------------------------------------------------------------------------
 */
 func (g *graph) dfs(from int, visited map[int]struct{}, stack *[]int) {
