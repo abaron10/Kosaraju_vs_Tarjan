@@ -1,19 +1,19 @@
 package graphTarjan
 
 import (
-	"SCC_analysis/graph"
+	g "SCC_analysis/graph"
 	"fmt"
 	"github.com/abaron10/Gothon/gothonSlice"
 )
 
-type graphT struct {
-	addedNodes []int
-	onStack    map[int]struct{}
-	stack      []int
-	ids        map[int]int
-	id         int
-	lowLink    map[int]int
-	graphNodes map[int][]*edge
+type graph struct {
+	nodes   []int
+	onStack map[int]struct{}
+	stack   []int
+	ids     map[int]int
+	id      int
+	lowLink map[int]int
+	edges   map[int][]*edge
 }
 
 type edge struct {
@@ -25,42 +25,42 @@ func newEdge(from int, to int) *edge {
 	return &edge{from: from, to: to}
 }
 
-func NewGraphT() graph.Graph {
-	return &graphT{addedNodes: []int{}, ids: map[int]int{}, lowLink: map[int]int{}, graphNodes: map[int][]*edge{}, onStack: map[int]struct{}{}, stack: []int{}, id: -1}
+func NewGraph() g.Graph {
+	return &graph{nodes: []int{}, ids: map[int]int{}, lowLink: map[int]int{}, edges: map[int][]*edge{}, onStack: map[int]struct{}{}, stack: []int{}, id: -1}
 }
 
-func (g *graphT) AddEdge(from int, to int) {
-	edges, _ := g.graphNodes[from]
+func (g *graph) AddEdge(from int, to int) {
+	edges, _ := g.edges[from]
 	edges = append(edges, newEdge(from, to))
 
-	g.graphNodes[from] = edges
-	g.addedNodes = append(g.addedNodes, from)
+	g.edges[from] = edges
+	g.nodes = append(g.nodes, from)
 }
 
-func (g *graphT) EvaluateSCC() {
+func (g *graph) EvaluateSCC() {
 	visited := map[int]struct{}{}
 
-	for _, node := range g.addedNodes {
+	for _, node := range g.nodes {
 		if _, alreadyVisitedNode := visited[node]; !alreadyVisitedNode {
-			g.dfsImplementation(node, g.graphNodes, visited)
+			g.dfs(node, g.edges, visited)
 		}
 	}
-	//g.computeAnswer(g.lowLink)
+	g.computeAnswer(g.lowLink)
 }
 
-func (g *graphT) computeAnswer(sccKeys map[int]int) {
+func (g *graph) computeAnswer(sccKeys map[int]int) {
 	response := map[int][]int{}
 	for node, sscComponent := range sccKeys {
 		response[sscComponent] = append(response[sscComponent], node)
 	}
 
-	fmt.Println("The SCC (Strong connected components) calculated with Tarjan's Algorithm are:")
+	fmt.Println("The SCC (Strongly connected components) calculated with Tarjan's Algorithm are:")
 	for _, value := range response {
 		fmt.Printf("- %v \n", value)
 	}
 }
 
-func (g *graphT) dfsImplementation(from int, graph map[int][]*edge, visited map[int]struct{}) {
+func (g *graph) dfs(from int, graph map[int][]*edge, visited map[int]struct{}) {
 	visited[from] = struct{}{}
 	g.id++
 	g.ids[from] = g.id
@@ -73,7 +73,7 @@ func (g *graphT) dfsImplementation(from int, graph map[int][]*edge, visited map[
 	if ok {
 		for _, edge := range edges {
 			if _, visitedNode := visited[edge.to]; !visitedNode {
-				g.dfsImplementation(edge.to, graph, visited)
+				g.dfs(edge.to, graph, visited)
 			}
 
 			if _, isOnStack := g.onStack[edge.to]; isOnStack {
